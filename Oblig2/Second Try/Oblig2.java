@@ -6,7 +6,7 @@ public class Oblig2{
 	}
 
 	public static void Sekvensiell(){
-		int maxnum = 1000;
+		int maxnum = 100;
 		EratosthenesSil es = new EratosthenesSil(maxnum);
 		//es.printAllPrimes();
 	}
@@ -25,21 +25,18 @@ public class Oblig2{
 
 		 EratosthenesSil (int maxNum) {
 	        this.maxNum = maxNum;
-			bitArr = new byte [(maxNum/14)+1];
-			setAllPrime();
+					bitArr = new byte [(maxNum/14)+1];
+					setAllPrime();
 	        generatePrimesByEratosthenes();
-	        //printBitArr();
+					//checkprimes();
 	      } // end konstruktor ErathostenesSil
 
-	  	void printBitArr(){
-	        for(int i = 0; i < bitArr.length; i++){
-	        	System.out.println(i + " " + Integer.toBinaryString(bitArr[i]));
-	        }
-	  	}
+			void checkprimes(){
+				PrimeChecker pc = new PrimeChecker();
+				//pc.readfile("1000firstprimes.txt");
+				pc.checkBitprimes(bitArr);
+			}
 
-	  	void printBinString(int bin){
-	  		System.out.println(Integer.toBinaryString(bin));
-	  	}
 		  void setAllPrime() {
 			  for (int i = 0; i < bitArr.length; i++) {
 			   bitArr[i] = (byte)127;
@@ -48,15 +45,11 @@ public class Oblig2{
 
 	      void crossOut(int i) {
 	       // set as not prime- cross out (set to 0)  bit represening 'int i
-
-	           	 System.out.println("num:\t" + i);
-
-	             int bytenum = i/127;
+				 assert i % 2 == 1;
+	             int bytenum = i/(bitPrByte*2);
 	             int bitnuminByte = (i%(bitPrByte*2))/2;
-	             System.out.println("bitnum: " + bitnuminByte);
 
 	           	 int piv =  bitArr[bytenum] & ~(1 << bitnuminByte);
-	           	 printBinString(piv);
 	             bitArr[bytenum] = (byte) piv;
 		   } //
 
@@ -68,8 +61,8 @@ public class Oblig2{
 	      		return false;
 	      	}
 
-			int bytenum = val/127;
-	        int bitnuminByte = (val%(bitPrByte*2))/2;	
+					int bytenum = val/(bitPrByte*2);
+	        int bitnuminByte = (val%(bitPrByte*2))/2;
 	        return (bitArr[bytenum] & (1 << bitnuminByte)) != 0;
 		 }
 
@@ -93,7 +86,7 @@ public class Oblig2{
 	      			int piv = 2;
 
 	      			for(; (num % piv) != 0; piv++){}
-	      			
+
 	      			if(num == piv){
       					return num;
       				}
@@ -112,22 +105,27 @@ public class Oblig2{
 		  void generatePrimesByEratosthenes() {
 			  // krysser av alle  oddetall i 'bitArr[]' som ikke er primtall (setter de =0)
 
-			      
-			  		crossOut(10);      // 1 is not a prime
-			      
 
-			       /*int prime = nextPrime(1);
+			  		crossOut(1);      // 1 is not a prime
+			       int prime = 3;
 
 			       while(prime < Math.sqrt(maxNum)){
+							 	System.out.print("prime: " + prime + "[");
 			       		int doubleprime = prime*prime;
-			       		for(int i = 0; i < maxNum; i++){
+
+			       		for(int i = 0; i < maxNum; i+=2){
 			       			int piv = doubleprime + 2*i*prime;
-			       			if(piv % 2 != 0 && piv < maxNum){ //Sjekk for å kun krysse av oddetall
-			       				crossOut(piv);
-			       			}
+									assert piv % 2 == 1;
+
+									if (piv < maxNum) {
+										System.out.print(" " + piv + " ");
+										//crossOut(piv);
+									}
 			       		}
+								System.out.println("]");
 			       		prime = nextPrime(prime);
-			       }*/
+								assert prime % 2 == 1;
+			       }
 		 	 } // end generatePrimesByEratosthenes
 
 
