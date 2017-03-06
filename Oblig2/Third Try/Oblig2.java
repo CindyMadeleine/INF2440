@@ -5,24 +5,30 @@ public class Oblig2 {
 	public static void main(String[] args) {
 		int nrRuns = 7;
 		for(int i = 2000000; i <= 2000000000 ; i*=10){
-			long totalNtime = 0;
+			long totalSekvensiellNtime = 0;
+			long totalParallellNtime = 0;
+
+			long start, elapsedTime;
 			for(int j = 0; j < nrRuns; j++){
-				long start = System.nanoTime();
+				start = System.nanoTime();
 				sekvensiell(i);    
-				long elapsedTime = System.nanoTime() - start;
+				elapsedTime = System.nanoTime() - start;
 				System.out.println("Sekvensiell: Round " + j + " time:\t" + (elapsedTime / 1000000000.0));
-				
+				totalSekvensiellNtime += elapsedTime;
+
 				start = System.nanoTime();
 				//parallell(i);
 				oldParallell(i);
 				elapsedTime = System.nanoTime() - start;
 				System.out.println("Parallell: Round " + j + " time:\t" + (elapsedTime / 1000000000.0));
-				
-				totalNtime+=elapsedTime;
+				totalParallellNtime += elapsedTime;
 			}
 
-			totalNtime /= nrRuns;
-			System.out.println("N:\t" + i + "\tTotal time:\t" + (totalNtime / 1000000000.0));
+			totalSekvensiellNtime /= nrRuns;
+			totalParallellNtime /= nrRuns;
+			System.out.println("Sekvensiell N:\t" + i + "\tTotal time:\t" + (totalSekvensiellNtime / 1000000000.0));
+			System.out.println("Parallell N:\t" + i + "\tTotal time:\t" + (totalParallellNtime / 1000000000.0));
+		
 		}
 	}
 
@@ -289,11 +295,7 @@ public static class ErathostenesThread implements Runnable{
 		  public void factorizeParallell (int startnum, int endnum) {
 		  		while(stop){}
 
-		  		if(endnum > currNum){
-		  			endnum = (int) currNum;
-		  		}
-
-				for(int idx = startnum; idx < endnum; idx++){
+				for(int idx = startnum; idx < endnum && idx <= currNum; idx++){
 					if(currNum % idx == 0 && isPrime(idx)){
 						division((long) idx);
 						idx = startnum - 1;

@@ -1,0 +1,37 @@
+Parallell:
+to linjer om hvordan programmet kompileres og kjøres i et terminalvindu.
+
+Kompileres ved å skrive javac *.java i terminalvindu
+Kjøres ved å skrive java Oblig2
+
+
+Parallell
+
+N:      2000000 		Total time:     0,417491005s
+N:      20000000        Total time:     11,701515699s
+N:      200000000       Total time:     336,942914643s
+
+Sekvensiell:
+
+
+Speedup for den sekvensielle løsningen mot den parallelle:
+
+Sekvensiell N:  2000000 		Total time:     		0.024247467
+Parallell N:    2000000 		Total time:     		0.419268447
+Sekvensiell N:  20000000        Total time:    			0.271207445
+Parallell N:    20000000        Total time:     		10.734296536
+Parallell N:	200000000 		Round 3 time:    	    283.349985922
+Sekvensiell: 	200000000		Round 4 time:      		6.491846783
+
+
+Hvordan en 10-doblig av problemets størrelse gir utslag kjøretidene – mer eller mindre enn 10-dobling i kjøretidene? Finner du et mønster?
+
+I henhold til tallene nevnt i tabelloversikten over de parallell og sekvensiellen kjøretidene ser vi at kjøretiden multipliseres med minst 10 sekunder for hver 10-dobling av problemets størrelse.
+
+omtale etter hvilke prinsipper/oppdelinger du brukte da du parallelliserte de to sekvensielle algoritmene.
+
+Finne primtall:
+Først fant jeg alle primtall for kvadratroten av N og tildelte hver tråd sin byte-array å holde styr på. Jeg itereterte deretter gjennom alle primtall. Hver sin tråd fant indeksen hvor de skulle starte på. De utførte deretter funksjonen(num = primes * primes + 2 * indeks * primes) fra denne indeksen og oppover til de hadde nådd slutten av sitt byte array. Når tråden ble ferdig med sin oppgave venter tråden på at alle de andre trådene skulle bli ferdig med deres oppgave. Når alle subtrådene er ferdig printer hovedtråden ut alle primtallene. 
+
+Faktoriseringen:
+Først tildelte jeg startposisjonen og sluttposisjonen som de skulle starte på. Jeg itererer deretter gjennom alle tallene fra startposisjonen til endeposisjonen. Iterasjonen avsluttes dersom indeksen er over currNum. Om man får modulo lik 0 når man tar modulo av et primtall og currNum, så vil tråden oppdatere currNum og deretter på nytt starte på sin startposisjon. Det er kun en tråd som kan oppdaterer currNum om gangen.  Når alle trådene er ferdig med sin oppgave printer hovedtråden ut primtallsfaktoriseringen. 
