@@ -1,5 +1,3 @@
-package Oblig3;
-
 public interface multisortthreadtask {
 	public void run();
 

@@ -1,22 +1,16 @@
-package Oblig3;
-
 import java.util.Arrays;
 import java.util.concurrent.CyclicBarrier;
 
 public class MultiSortThread implements Runnable, multisortthreadtask {
 	int startpos, endpos;
 	MultiSort msort;
-	int[] count;
 	CyclicBarrier synk;
-	
-	
-	public MultiSortThread(int startpos, int endpos, MultiSort msort, CyclicBarrier barrier){
+	int[] count;
+
+	public MultiSortThread(int startpos, int endpos, MultiSort msort, CyclicBarrier barrier, int[] a, int[] b, int maskLen, int shift){
 		this.startpos = startpos;
 		this.endpos = endpos;
 		this.msort = msort;
-		
-		
-		count = new int[msort.numSIf];
 		synk = barrier;
 	}
 
@@ -43,15 +37,14 @@ public class MultiSortThread implements Runnable, multisortthreadtask {
 			arrB[count[(arrA[i]>>>shift) & mask]++] = arrA[i];
 		}
 	}
-	
-	public void radixSort(int [] a, int [] b, int maskLen, int shift){
-		System.out.println(maskLen);
+
+	public void radixSort ( int [] a, int [] b, int mask, int shift){
+
 	}
 
 	@Override
 	public void run() {
-		
 	}
 
-	
+
 }
