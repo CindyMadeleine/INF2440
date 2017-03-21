@@ -4,15 +4,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class MultiRadixSort{
+
+	/**
+	 * When n is equal to and above 200 000 000 I got memory out of bounds problems.
+	 * 
+	 * @param args
+	 */
   public static void main(String[] args){
-    int n = 20;
+    int n = 26;
     //make array
 	int[] arr = new int[n];
 	int counter = 0;
     //gir error!
      for(int i = 0; i < n; i++, counter++){
       arr[i] = counter;
-      if(counter % 10 == 0){
+      if(counter % 5 == 0){
     	  counter = 0;
       }
     }
@@ -138,7 +144,11 @@ public class MultiRadixSort{
        a = b;
        b = t;
      }
+      
      
+     /**
+      *  Sort the numbers, but have a problem when a contains 0.
+      */
      if((msort.bit.length&1) != 0 ) {      
     	 // et odde antall sifre, kopier innhold tilbake til original a[] (nå b)      
     	 System.arraycopy (a,0,b,0,a.length);     
