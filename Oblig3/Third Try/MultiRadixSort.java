@@ -11,21 +11,31 @@ public class MultiRadixSort{
 	 * @param args
 	 */
   public static void main(String[] args){
-    int n = 28;
-    int[] arr = new int[n];
-    int counter = n;
-    for(int i = 0; i < n; i++, counter--){
-      arr[i] = counter;
-      if(counter % 7 == 0){
-        counter = n;
-      }
+    int n = 10000;
+    int start = 10;
+    boolean status = true;
+    for(int i = start; i <= n && status; i++){
+      System.out.print("N: " + i  + "\t");
+      status = run(i);
     }
 
-  System.out.print("Original array:\t\t(");
+  }
+
+  public static boolean run(int n){
+    int[] arr = new int[n];
+    int counter = 0;
+    for(int i = 0; i < n; i++, counter++){
+      arr[i] = counter;
+      /*if(counter % 10 == 0){
+        counter = 0;
+      }*/
+    }
+
+  /*System.out.print("Original array:\t\t(");
   for(int i = 0; i < arr.length; i++){
     System.out.print(arr[i] + " ");
   }
-  System.out.println(")");
+  System.out.println(")");*/
 
   int num_bit = 7;
 	MultiSort msort = new MultiSort(arr, num_bit);
@@ -33,21 +43,42 @@ public class MultiRadixSort{
 	//partision array
 	if(!findMax(msort, nrThreads)){
 		System.out.println("Can not find max num");
-		return;
+		return false;
 	}
 
     msort.initBits();
 
     if(!sort(msort, nrThreads)){
       System.out.println("Can not sort num");
-			return;
+			return false;
     }
 
-    System.out.print("Final array: \t\t(");
-    for(int i = 0; i < arr.length; i++){
-      System.out.print(msort.arr[i] + " ");
+
+    int piv = testSort(arr);
+    if(piv >= 0){
+      System.out.print("Final array: \t\t(");
+      int i = piv - 100;
+      if(i < 0){
+        i = 0;
+      }
+      for(; i < piv+100 && i < arr.length; i++){
+        System.out.print(arr[i] + " ");
+      }
+      System.out.println(")");
+      return false;
     }
-    System.out.println(")");
+    return true;
+  }
+
+  static int testSort(int [] a){
+    for (int i = 0; i< a.length-1;i++) {
+      if (a[i] > a[i+1]){
+        System.out.println("SorteringsFEIL på plass: "+i +" a["+i+"]:"+a[i]+" > a["+(i+1)+"]:"+a[i+1]);
+        return i;
+      }
+    }
+    System.out.println("Sorting successfull!");
+    return -1;
   }
 
 	public static boolean findMax(MultiSort msort, int nrThreads){
