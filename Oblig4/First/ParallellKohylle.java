@@ -7,6 +7,7 @@ public class ParallellKohylle{
 	int[] x, y;
 	int minXPos, maxXPos;
 	ReentrantLock lock;
+	int nrCores;
 
 	public ParallellKohylle(int[] x, int[] y, IntList m, IntList kohyll){
 		this.x = x;
@@ -20,22 +21,25 @@ public class ParallellKohylle{
 		minXPos = 0;
 		maxXPos = 0;
 
-		int nrThreads = Runtime.getRuntime().availableProcessors();
-		Thread[] thrarr = new Thread[nrThreads];
+		nrCores = Runtime.getRuntime().availableProcessors();
+		if(nrCores < 2){
+			//do sequentiel solution
+			return;
+		}
+		Thread[] thrarr = new Thread[nrCores];
 
 		//Prepare threaddata
-		int arrPart = x.length / nrThreads;
-		int rest = x.length % nrThreads;
+		int arrPart = x.length / nrCores;
+		int rest = x.length % nrCores;
 		int start = 0, end = arrPart;
-		CyclicBarrier barrier = new CyclicBarrier(nrThreads);
 
-		for(int i = 0; i < nrThreads; i++){
+		for(int i = 0; i < nrCores; i++){
 			if(rest > 0){
 				end++;
 				rest--;
 			}
 
-			thrarr[i] = new Thread(new KohyllThread(i, barrier, start, end));
+			thrarr[i] = new Thread(new MaxMinThread(i, start, end));
 			thrarr[i].start();
 			start = end;
 			end += arrPart;
@@ -50,11 +54,39 @@ public class ParallellKohylle{
 			}
 		}
 
-
 		/*System.out.println(x[minXPos] + " " + x[maxXPos]);
 		for(int i = 0; i < x.length; i++){
 			System.out.println(x[i]);
 		}*/
+
+
+		// finner først ut hvor langt ned i kalltreet vi skal bruke tråder.
+		int maxLevel = 0;
+		for(double nrNodes = 0.0; nrNodes < nrCores; maxLevel++){
+			nrNodes = Math.pow(2, maxLevel);
+		}
+		//maxLevel = 0; //REMEMBER TO DELETE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		int level = 0;
+		KohyllThread kt = new KohyllThread(level, maxLevel, maxXPos, minXPos, m);
+		Thread t = new Thread(kt);
+		t.start();
+
+		KohyllThread kt2 = new KohyllThread(level, maxLevel, minXPos, maxXPos, m);
+		Thread t2 = new Thread(kt2);
+		t2.start();
+
+		try{
+			t.join();
+			t2.join();
+		} catch(InterruptedException ie){
+			return;
+		}
+
+		kohyll.add(maxXPos);
+		kohyll.append(kt.localkohyll);
+		kohyll.add(minXPos);
+		kohyll.append(kt2.localkohyll);
 	}
 
 	public void updateMinMaxX(int minPos, int maxPos){
@@ -73,8 +105,21 @@ public class ParallellKohylle{
 		}
 	}
 
+  public void sekvRek (int p1, int p2, int p3, IntList m, IntList koHyll){
+    int rightcoord = findPointWithMostNegativeDistance(p1, p3, m);
+    if (rightcoord != -1) {
+      IntList line = drawLineBetweenPoints(p1, p3, m);
+      sekvRek(p1, p3, rightcoord, line, koHyll);
+    }
 
+    koHyll.add(p3);
 
+  	int leftcoords = findPointWithMostNegativeDistance(p3, p2, m);
+    if (leftcoords != -1) {
+        IntList line = drawLineBetweenPoints(p3, p2, m);
+        sekvRek(p3, p2, leftcoords, line, koHyll);
+    }
+  }
 
 	private double getDistance(int x1, int y1, int x2, int y2, int x, int y){
 		int a = y1 - y2;
@@ -122,30 +167,65 @@ public class ParallellKohylle{
 	}
 
 
-	 public void sekvRek (int p1, int p2, int p3, IntList m, IntList koHyll){
-	    int rightcoord = findPointWithMostNegativeDistance(p1, p3, m);
-	    if (rightcoord != -1) {
-	      IntList line = drawLineBetweenPoints(p1, p3, m);
-	      sekvRek(p1, p3, rightcoord, line, koHyll);
-	    }
 
-	    koHyll.add(p3);
+		public class KohyllThread implements Runnable{
+			int level, maxLevel;
+			IntList localkohyll;
+			IntList m;
+			int p1, p2;
 
-	  	int leftcoords = findPointWithMostNegativeDistance(p3, p2, m);
-	    if (leftcoords != -1) {
-	        IntList line = drawLineBetweenPoints(p3, p2, m);
-	        sekvRek(p3, p2, leftcoords, line, koHyll);
-	    }
-	  }
+			public KohyllThread(int level, int maxLevel, int p1, int p2, IntList m){
+				this.level = level;
+				this.maxLevel = maxLevel;
+				this.p1 = p1;
+				this.p2 = p2;
+				this.m = m;
+				localkohyll = new IntList();
+			}
+
+			public void run(){
+				IntList xcoords = drawLineBetweenPoints(p1, p2, m);
+				int xcoord = findPointWithMostNegativeDistance(p1, p2, xcoords);
+
+				if(xcoord == -1){
+					return;
+				} else if(level < maxLevel){
+					KohyllThread kt = new KohyllThread(level + 1, maxLevel, p1, xcoord, xcoords);
+					Thread t = new Thread(kt);
+					t.start();
+
+					KohyllThread kt2 = new KohyllThread(level + 1, maxLevel, xcoord, p2, xcoords);
+					Thread t2 = new Thread(kt2);
+					t2.start();
+
+					try{
+						if(t != null){
+								t.join();
+								localkohyll.append(kt.localkohyll);
+						}
+
+						localkohyll.add(xcoord);
+
+						if(t2 != null){
+							 	t2.join();
+						 		localkohyll.append(kt2.localkohyll);
+						}
+					} catch(InterruptedException ie){
+						return;
+					}
+				} else {
+					sekvRek(p1, p2, xcoord, xcoords, localkohyll);
+				}
+		}
+	}
 
 
-
-	public class KohyllThread implements Runnable{
+	public class MaxMinThread implements Runnable{
 		int ind;
 		CyclicBarrier barrier;
 		int start, end;
 
-		public KohyllThread(int ind, CyclicBarrier barrier, int start, int end){
+		public MaxMinThread(int ind, int start, int end){
 			this.ind = ind;
 			this.barrier = barrier;
 			this.start = start;
@@ -153,29 +233,6 @@ public class ParallellKohylle{
 		}
 
 		public void run(){
-			findMinMaxX();
-
-			try{
-				barrier.await();
-			} catch(BrokenBarrierException bbe){
-				return;
-			} catch(InterruptedException ie){
-				return;
-			}
-
-			if(ind == 0){
-		    IntList xcoords = drawLineBetweenPoints(maxXPos, minXPos, m);
-		    int xcoord = findPointWithMostNegativeDistance(maxXPos, minXPos, xcoords);
-				sekvRek(maxXPos, minXPos, xcoord, xcoords, kohyll);
-			} else if(ind == 1){
-				IntList p = new IntList();
-				IntList xcoords = drawLineBetweenPoints(minXPos, maxXPos, m);
-				int xcoord = findPointWithMostNegativeDistance(minXPos, maxXPos, xcoords);
-				sekvRek(minXPos, maxXPos, xcoord, xcoords, kohyll);
-			}
-		}
-
-		void findMinMaxX(){
 			int localMin = x[start], localMax = x[start];
 			int maxPos = start, minPos = start;
 
