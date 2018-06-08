@@ -1,0 +1,114 @@
+import java.lang.Iterable;
+import java.util.*;
+
+public class Tabell<T> implements AbstraktTabell<T> {
+    T[] tabell;
+    int arraylengde;
+    int antallElementer = 0;
+
+	@SuppressWarnings("unchecked")
+    public Tabell(int arraylengde){
+        this.arraylengde = arraylengde;
+        tabell = (T[]) new Object[arraylengde];
+    }
+
+    @SuppressWarnings("unchecked")
+   public void dobblePlassITabell(){
+    	int nyLengde = arraylengde * 2;
+    	T[] beholder = (T[]) new Object[nyLengde];
+    	beholder = tabell;
+    	arraylengde = nyLengde;
+    }
+ 
+    public boolean settInnPaaOppgittPlass(int index, T element) {
+    	if(arraylengde == antallElementer){
+    		int antPlasser = arraylengde;
+    		dobblePlassITabell();
+
+    		if(antPlasser == (arraylengde * 2)){
+    			System.out.println("Antall plasser er nu doblet");
+    		}
+    	}
+
+		try {
+			if(finnObjektPaaOppgittPlass(index) == null){
+				tabell[index] = element;	
+				antallElementer++;
+				System.out.println("Objektet er nu satt inn");
+				return true;
+			}
+		} catch ( ArrayIndexOutOfBoundsException arr) {
+			arr.getMessage();
+		}
+		
+		System.out.println("Oppgitt plass ikke ledig. Forsok en annen plass!");
+		return false;
+    }
+
+    public T finnObjektPaaOppgittPlass(int index) {
+        try{
+        	T tmp = tabell[index];
+
+            return tmp;
+        } catch(ArrayIndexOutOfBoundsException i){
+            System.out.println("Du har angitt en plass som ikke finnes i arrayet");   
+			return null;
+        }  	
+    }
+
+    /* public T[] hentArray(){
+    	return tabell;
+    } */
+
+    public int getAntallElementer(){
+    	return antallElementer;
+    }
+	
+
+	public T finnObjektEtterNokkel(String keystring){ 							//Må implementer toString på alle metodene!
+		TabellIterator tabellIt = iterator();
+		T tmp;
+
+		//System.err.println("kjorer finnObjektEtterNokkel");
+		while(tabellIt.hasNext()){
+			tmp = tabellIt.next();
+			System.err.println(tmp);
+			if(tmp.toString().equalsIgnoreCase(keystring)){
+				//System.err.println("Found match: " + tmp.toString());
+				return tmp; 
+			}
+			//System.err.println("No match: " + tmp.toString());
+		}
+		//System.err.println("return finnObjektEtterNokkel");
+		return null;
+	} 
+
+	public TabellIterator iterator(){
+		return new TabellIterator();
+	}
+
+	private class TabellIterator implements Iterator<T>{				
+		private int forrigeRetElement;
+		private int antReturnerte;
+
+		TabellIterator() {
+			forrigeRetElement = 0;
+			antReturnerte = 0;
+		}								
+
+		public boolean hasNext(){
+			return forrigeRetElement < tabell.length && antReturnerte < antallElementer;
+		}
+
+		public T next(){	
+				while (tabell[forrigeRetElement] == null)
+					forrigeRetElement++;
+					antReturnerte++;
+				return tabell[forrigeRetElement];			
+		}
+		
+		public void remove(){								
+			throw new UnsupportedOperationException();
+		}
+	}
+}
