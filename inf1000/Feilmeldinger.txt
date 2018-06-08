@@ -1,0 +1,44 @@
+2.4 A
+Kjørefeil og kompileringsfeil er to forskjellige feil vi kan få i Java.
+Kjørefeil skjer når du har «mistet» informasjon i programvaren. Programmet gjør noe, men det gjør ikke det det skal gjøre. For eksempel når du har glemt skrevet inn feil verdier, eller i. Denne type feil kalles derfor ofte syntax error.  
+
+Når du får kompileringsfeil er noe feil med måten du har formulert deg i Java. Kompileren finner dette, og vil derfor ikke kjøre. Du vil da få en feil, som viser hvor du har brutt Java språket. Eksempel på dette er når du har glemt å lukke alle parentesene. Denne typen feil kalles derfor på folkemunne logisk feil.
+
+2.4B
+Class Feilmeldinger{
+      public static void main(String[] args) {
+      system.out.println("Velkommen til feilmeldinger!")
+      }
+}
+
+Gir følgende feilmeldinger:
+Feilmeldinger.java:1: error: class, interface, or enum expected
+Class Feilmeldinger{
+^
+Feilmeldinger.java:2: error: class, interface, or enum expected
+public static void main(String[] args) {
+
+
+1
+For å rette opp I koden vil jeg endre på 
+public class Feilmeldinger{
+      public static void main(String[] args) {
+      System.out.println("Velkommen til feilmeldinger!");
+      }
+}
+Sagt på en annen måte må vi endre på:
+1. Vi føye til public foran Class på første linje. 
+2. Deretter må vi skrive Class med små bokstaver.
+3. Så må vi skrive system i fjerde linje med stor forbokstav
+4. Til slutt må vi anvende semikolon.
+
+2
+public static void main(String[] args) { er skrevet gramatisk korrekt, og er derfor ingen feil i seg selv.  Om vi derimot leser i linjen over vil vi finne feilen. Her mangler class med liten forbokstav, samtidig som vi har glemt av public. Vi får dermed ikke lest av programmet, og får feilmeldingen class, interface, or enum expected.. Dette kan rettes opp ved å skrive public class Feilmeldinger{ 
+
+3
+I linje 3 har vi fått feilmeldingen ’;’ expected, fordi det mangler ett semikolon etter outputet. Dette kan rettes opp ved at føyer til akkurat semikolon bak outputet.  Den andre feilen viser at det ikke finnes noen pakke som heter system.out.println. Dette skyldes at Java er fin på bruken av stor og liten forbokstav.Vi må derfor skrive System.out.println med stor forbokstav.
+
+
+
+
+
